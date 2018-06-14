@@ -1,0 +1,59 @@
+//
+  Open vMonitor is a WEB-based tool for monitoring and troubleshooting Open vSwitch
+  Copyright (C) 2014-2016  PLVision
+  Ihor Chumak, Roman Gotsiy
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  PLVision, developers@plvision.eu
+
+html
+  head
+    meta(charset='utf-8')
+    title VTAP Setting
+  body
+    br
+    br
+    form(action="/cmd_set", id="cmdset",method='POST')
+      | cmd exec:
+      input(type='text', style='width:700px;height:30px',name='cmd')
+      input.myForm(type='button', value='submit')
+      br
+      | cmd result
+      textarea#txt(style='width:700px;height:50px')  
+      //textarea#txt(rows='', cols='700px',onpropertychange='this.style.posHeight=this.scrollHeight ')  
+      //<textarea  id="txt" rows="" cols=""></textarea>
+  script.
+      $(function() {
+      $(".myForm").on('click', function() {  //添加点击事件
+      var cmd = $("input:nth-of-type(1)").val();   //获取两个的参数
+      $.post("/cmd_set", { //jq的post方法
+      cmd: cmd
+      }, function(res) {
+      var txt=document.getElementById('txt');
+      txt.innerHTML = "";
+      txt.style.posHeight=200;
+      txt.innerHTML = res;
+      //alert(txt.scrollHeight);
+      if(txt.scrollHeight>200){ 
+         alert("Height >200 ,adatption");
+         txt.style.posHeight=txt.scrollHeight;
+        } //加24为一行的高度，减32为padding和border
+      else {
+            txt.style.posHeight=txt.scrollHeight;
+        }
+      //alert(res);
+      })
+      })
+      })

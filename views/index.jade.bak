@@ -78,8 +78,8 @@ block sidebar
       a.link(href='/Flow_Sample_Collector_Set' data-page="Flow_Sample_Collector_Set") Flow Sample Collector Set
     li
       a.link(href="/cpu" data-page="ydy_cpu") CPU
-    li
-      a.link(href="/cmd" data-page="cmd") cmd
+	//li
+	//  a.link(href="/cmd" data-page="cmd") ydy_cmd
 //    li
 //      a.link(href='/alerts' data-page="Alerts") Alerts
 //      a.link(href="/SSL" data-page="SSL") SSL

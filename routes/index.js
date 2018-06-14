@@ -23,5 +23,6 @@
 var extend = require("../lib/extend.js");
 var table_routes = require("./table_routes.js");
 var bridge_stats_route = require("./bridge_stats_route.js");
+var cpu_status = require("../syscmd/cpu_status.js");
 
-extend(module.exports, table_routes, bridge_stats_route);
+extend(module.exports, table_routes, bridge_stats_route,cpu_status);

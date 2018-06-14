@@ -50,6 +50,8 @@ var client_manager = require("./lib/client-manager.js")(app);
 
 var utils = require("./lib/utils.js");
 var routes = require("./routes");
+//var nodeCmd = require('node-cmd');
+
 
 app.listen = function () {
     var options = undefined;
@@ -85,6 +87,7 @@ app.load_config = function (callback) {
     var config;
     var config_file = __dirname + "/config.json";
 
+	console.log('config_file=',config_file);
     app.set('configErr', undefined)
     fs.exists(config_file, function (exists) {
         if (exists) {
@@ -212,7 +215,7 @@ app.use(function (req, res, next) {
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
-app.set('title', "Open_vMonitor");
+app.set('title', "VCMY_Monitor");
 app.set('default_connection_address', '127.0.0.1');
 app.set('username', 'admin');
 
@@ -222,6 +225,8 @@ app.set('username', 'admin');
 // });
 
 app.all('/enter', function (req, res, next) {
+	console.log('loging');
+
     // get all possible arguments
     var ip = req.query.database_ip_address || req.body.database_ip_address;
     var port;
@@ -247,6 +252,8 @@ app.all('/enter', function (req, res, next) {
     }
 
     if (req.method == 'GET' && redirect) {
+		
+	    console.log('enter get:');
         res.render('enter', {
             title: app.get('title'),
             username: app.get('username'),
@@ -268,10 +275,12 @@ app.all('/enter', function (req, res, next) {
                 if (!err) {
                     // if client specifies a page through a POST request, redirect
                     if (req.query.page) {
+						 console.log('enter redirect to selected page');
                         var item = req.query.item || '';
                         debug('redirect to selected page');
                         res.redirect(req.query.page + '/' + item);
                     } else {
+						console.log('enter redirect to /');
                         debug('redirect to /');
                         res.redirect('/');
                     }
@@ -289,6 +298,8 @@ app.all('/enter', function (req, res, next) {
 //});
 
 app.get('/alerts/:action?', function (req, res, next) {
+	console.log('action');
+
     var db_name = req.session.db_name;
     var addr = req.session.connection;
     var count = -1;
@@ -323,6 +334,7 @@ app.get('/alerts/:action?', function (req, res, next) {
 });
 
 app.get('/updates', function (req, res, next) {
+	console.log('update');
     var db_name = req.session.db_name;
     var addr = req.session.connection;
     var count = -1;
@@ -338,27 +350,37 @@ app.get('/updates', function (req, res, next) {
     });
 });
 
+
+
+
 app.get('/logout', function (req, res, next) {
+	console.log('YDY log');
+	debug('[YDY]Logout');
     client_manager.closeAll();
+	//res.send('YDY logout');
     req.session.connection = null;
     res.redirect('/enter');
 });
 
 app.post('/select-db/:db_name', function (req, res, next) {
     var db_name = req.params.db_name;
+	//res.send('/select-db/:db_name');;
     req.session.db_name = db_name;
     res.status(200).end();
 });
 
 app.get('/', function (req, res, next) {
+	//res.send('/');
     res.redirect('/Open_vSwitch');
 });
 
 app.get('/raw_json', function (req, res, next) {
+	res.send('/raw_json');
     res.renderView('raw_json');
 });
 
 app.post('/:db_name/raw_json', function (req, res, next) {
+	res.send('/:db_name/raw_json');
     var db_name = req.session.db_name;
     var addr = req.session.connection;
 
@@ -419,6 +441,41 @@ app.get('/_switch_view', function (req, res, next) {
         });
     });
 });
+//app.get('/', routes.cpu_status);
+/*
+app.get('/cpu',function(req,res){
+    //routes.cpu_status.getCPU;
+	;
+	res.send('/ydy02cpu');
+    //res.renderView('cpu');
+
+});
+*/
+app.get('/cpu', routes.getCPU);
+app.get('/cmd', function(req,res){
+       res.renderView('cmd');
+});
+app.post('/cmd_set',function(req,res){
+
+    //var cmd=req.query.cmd;
+	var cmd=req.body.cmd;
+	console.log('YDY cmd'+cmd);
+	var spa = require('child_process');
+	spa.exec(cmd,function callback(err,stdout,stderr){
+        if(err)
+        {
+           console.log(err);
+           res.send(err);
+		}
+		else
+		{
+		  res.send(stdout);
+		  //res.send(stdout.replace(/\n/g,"<br/>"));
+		}
+		}).on('exit',function(code){
+            console.log('child process quit'+code);
+		});
+});
 
 app.get('/:table', routes.table_route);
 
@@ -459,7 +516,7 @@ app.use(function (err, req, res, next) {
 // openssl req -new -key ./certs/key.pem -out ./certs/certrequest.csr # lots of questions here
 // openssl x509 -req -in ./certs/certrequest.csr -signkey ./certs/key.pem -out ./certs/certificate.pem
 
-var app_name = 'Open_vMonitor';
+var app_name = 'VCMY_vMonitor';
 
 //var app = require('../app');
 //var debug = require('debug')(app_name);
